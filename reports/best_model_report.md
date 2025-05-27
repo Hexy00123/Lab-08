@@ -3,8 +3,9 @@
 ## Model Info
 
 - **Model Type**: GradientBoostingClassifier
-- **Max Depth**: 3
-- **N Estimators**: 50
+- **Parameters**:
+  - max_depth: 3
+  - n_estimators: 50
 
 ## Metrics
 
