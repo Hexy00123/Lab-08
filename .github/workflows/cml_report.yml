@@ -34,15 +34,14 @@ jobs:
           echo "| Precision     | $precision |" >> reports/best_model_report.md
           echo "| Recall        | $recall |" >> reports/best_model_report.md
           echo "| F1 Score      | $f1 |" >> reports/best_model_report.md
-          echo "| Max Depth     | $max_depth |" >> reports/best_model_report.md
-          echo "| N Estimators  | $n_estimators |" >> reports/best_model_report.md
           echo "" >> reports/best_model_report.md
 
           # Add images to the report
           echo "## Images" >> reports/best_model_report.md
           echo "" >> reports/best_model_report.md
           for img in models/best/*.png; do
-            echo "![Image]($img)" >> reports/best_model_report.md
+            rel_path=$(realpath --relative-to=reports "$img")
+            echo "![Image]($rel_path)" >> reports/best_model_report.md
           done
 
       - name: Commit and push changes
