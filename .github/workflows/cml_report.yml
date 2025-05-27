@@ -1,0 +1,56 @@
+name: Generate CML Report
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'models/**'
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Generate Report
+        run: |
+          # Extract metrics from metadata.json
+          precision=$(jq '.precision' models/best/metadata.json)
+          recall=$(jq '.recall' models/best/metadata.json)
+          f1=$(jq '.f1' models/best/metadata.json)
+          max_depth=$(jq '.params.max_depth' models/best/metadata.json)
+          n_estimators=$(jq '.params.n_estimators' models/best/metadata.json)
+
+          # Create a markdown table with the metrics
+          echo "# Best Model Report" > reports/best_model_report.md
+          echo "" >> reports/best_model_report.md
+          echo "## Metrics" >> reports/best_model_report.md
+          echo "" >> reports/best_model_report.md
+          echo "| Metric        | Value |" >> reports/best_model_report.md
+          echo "|---------------|-------|" >> reports/best_model_report.md
+          echo "| Precision     | $precision |" >> reports/best_model_report.md
+          echo "| Recall        | $recall |" >> reports/best_model_report.md
+          echo "| F1 Score      | $f1 |" >> reports/best_model_report.md
+          echo "| Max Depth     | $max_depth |" >> reports/best_model_report.md
+          echo "| N Estimators  | $n_estimators |" >> reports/best_model_report.md
+          echo "" >> reports/best_model_report.md
+
+          # Add images to the report
+          echo "## Images" >> reports/best_model_report.md
+          echo "" >> reports/best_model_report.md
+          for img in models/best/*.png; do
+            echo "![Image]($img)" >> reports/best_model_report.md
+          done
+
+      - name: Commit and push the report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add reports/best_model_report.md
+          git commit -m "Update best model report"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
