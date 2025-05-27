@@ -1,0 +1,8 @@
+scikit-learn
+streamlit
+uvicorn
+requests
+joblib
+fastapi 
+uvicorn 
+python-multipart
