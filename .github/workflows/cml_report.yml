@@ -20,7 +20,6 @@ jobs:
 
       - name: Run Backend and Test Predict Batch
         run: |
-          # Start backend in background
           cd backend
           python backend.py &
           BACKEND_PID=$!
@@ -33,7 +32,6 @@ jobs:
             sleep 1
           done
 
-          # Run predict_batch test
           RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X 'POST' \
             'http://localhost:8000/predict_batch' \
             -H 'accept: application/json' \
@@ -52,6 +50,7 @@ jobs:
           kill $BACKEND_PID
 
   generate-report:
+    needs: run-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +58,6 @@ jobs:
 
       - name: Generate Report
         run: | 
-          # Extract metrics from metadata.json
           precision=$(jq '.precision' models/best/metadata.json)
           recall=$(jq '.recall' models/best/metadata.json)
           f1=$(jq '.f1' models/best/metadata.json)
@@ -70,12 +68,6 @@ jobs:
 
           echo "# Best Model Report" > "$report_path"
           echo "" >> "$report_path"
-
-          mkdir -p reports
-          
-          # Create markdown report
-          echo "# Best Model Report" > reports/best_model_report.md
-          echo "" >> reports/best_model_report.md
           echo "## Model Info" >> "$report_path"
           echo "" >> "$report_path"
           echo "- **Model Type**: $model_type" >> "$report_path"
@@ -110,4 +102,3 @@ jobs:
           git add reports/best_model_report.md
           git commit -m "ci: Best model report update" || echo "No changes to commit"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
-
