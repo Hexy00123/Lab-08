@@ -1,4 +1,4 @@
-name: Generate CML Report
+name: Generate ML Report
 
 on:
   push:
@@ -21,37 +21,41 @@ jobs:
           precision=$(jq '.precision' models/best/metadata.json)
           recall=$(jq '.recall' models/best/metadata.json)
           f1=$(jq '.f1' models/best/metadata.json)
-          max_depth=$(jq '.params.max_depth' models/best/metadata.json)
-          n_estimators=$(jq '.params.n_estimators' models/best/metadata.json)
           model_type=$(jq -r '.model_filename' models/best/metadata.json | sed -E 's/model_(.*)\.joblib/\1/')
 
           mkdir -p reports
-          touch reports/best_model_report.md
+          report_path=reports/best_model_report.md
+
+          echo "# Best Model Report" > "$report_path"
+          echo "" >> "$report_path"
+
+          mkdir -p reports
           
           # Create markdown report
           echo "# Best Model Report" > reports/best_model_report.md
           echo "" >> reports/best_model_report.md
-          echo "## Model Info" >> reports/best_model_report.md
-          echo "" >> reports/best_model_report.md
-          echo "- **Model Type**: $model_type" >> reports/best_model_report.md
-          echo "- **Max Depth**: $max_depth" >> reports/best_model_report.md
-          echo "- **N Estimators**: $n_estimators" >> reports/best_model_report.md
-          echo "" >> reports/best_model_report.md
+          echo "## Model Info" >> "$report_path"
+          echo "" >> "$report_path"
+          echo "- **Model Type**: $model_type" >> "$report_path"
 
-          echo "## Metrics" >> reports/best_model_report.md
-          echo "" >> reports/best_model_report.md
-          echo "| Metric    | Value |" >> reports/best_model_report.md
-          echo "|-----------|-------|" >> reports/best_model_report.md
-          echo "| Precision | $precision |" >> reports/best_model_report.md
-          echo "| Recall    | $recall |" >> reports/best_model_report.md
-          echo "| F1 Score  | $f1 |" >> reports/best_model_report.md
-          echo "" >> reports/best_model_report.md
+          echo "- **Parameters**:" >> "$report_path"
+          jq -r '.params | to_entries[] | "  - \(.key): \(.value)"' models/best/metadata.json >> "$report_path"
+          echo "" >> "$report_path"
 
-          echo "## Images" >> reports/best_model_report.md
-          echo "" >> reports/best_model_report.md
+          echo "## Metrics" >> "$report_path"
+          echo "" >> "$report_path"
+          echo "| Metric    | Value |" >> "$report_path"
+          echo "|-----------|-------|" >> "$report_path"
+          echo "| Precision | $precision |" >> "$report_path"
+          echo "| Recall    | $recall |" >> "$report_path"
+          echo "| F1 Score  | $f1 |" >> "$report_path"
+          echo "" >> "$report_path"
+
+          echo "## Images" >> "$report_path"
+          echo "" >> "$report_path"
           for img in models/best/*.png; do
             rel_path=$(realpath --relative-to=reports "$img")
-            echo "![Image]($rel_path)" >> reports/best_model_report.md
+            echo "![Image]($rel_path)" >> "$report_path"
           done
 
       - name: Commit and push changes
