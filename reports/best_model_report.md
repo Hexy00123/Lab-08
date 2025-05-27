@@ -1,12 +1,18 @@
 # Best Model Report
 
+## Model Info
+
+- **Model Type**: GradientBoostingClassifier
+- **Max Depth**: 3
+- **N Estimators**: 50
+
 ## Metrics
 
-| Metric        | Value |
-|---------------|-------|
-| Precision     | 0.6451612903225806 |
-| Recall        | 0.32 |
-| F1 Score      | 0.42780748663101603 |
+| Metric    | Value |
+|-----------|-------|
+| Precision | 0.6451612903225806 |
+| Recall    | 0.32 |
+| F1 Score  | 0.42780748663101603 |
 
 ## Images
 
