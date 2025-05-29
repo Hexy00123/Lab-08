@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
+import os 
 
-BACKEND_URL = "http://0.0.0.0:8000"
+BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8000")
 
 def check_health():
     response = requests.get(f"{BACKEND_URL}/health")

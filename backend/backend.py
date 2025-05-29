@@ -2,12 +2,15 @@ import uvicorn
 from schemas.SampleSchema import SampleSchema
 from fastapi import FastAPI
 from fastapi import UploadFile, HTTPException
+import os 
 
 import joblib
 import pandas as pd
 
 app = FastAPI()
-model = joblib.load('../models/best/best_model_pipeline.joblib')
+
+model_path = os.getenv("MODEL_DIR", '../models/best') + "/best_model_pipeline.joblib"
+model = joblib.load(model_path)
 
 @app.get("/health", tags=['health'])  
 def health_check():
