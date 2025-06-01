@@ -26,6 +26,10 @@ jobs:
         run: |
           bash scripts/send_to_remote.sh ${{ secrets.SERVER_IP }}
 
+      - name: Stop running containers
+        run: |
+          ssh -o StrictHostKeyChecking=no default@${{ secrets.SERVER_IP }} 'cd /home/default/project && sudo docker compose down'
+
       - name: Deploy with Docker Compose
         run: |
           ssh -o StrictHostKeyChecking=no default@${{ secrets.SERVER_IP }} 'cd /home/default/project && sudo docker compose up -d --build'
