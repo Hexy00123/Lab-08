@@ -28,6 +28,6 @@ jobs:
 
       - name: Deploy with Docker Compose
         run: |
-          ssh -o StrictHostKeyChecking=no default@${{ secrets.SERVER_IP }} 'cd /home/default/project && docker-compose up -d --build'
+          ssh -o StrictHostKeyChecking=no default@${{ secrets.SERVER_IP }} 'cd /home/default/project && docker compose up -d --build'
 
       
