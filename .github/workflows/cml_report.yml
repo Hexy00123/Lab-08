@@ -1,23 +1,33 @@
 name: Generate ML Report
 
 on:
+  # event, when pipeline triggered
   push:
     branches:
       - main
     paths:
       - 'models/**'
       - 'backend/**'
+  # with this you can run workflow manually
   workflow_dispatch:
 
+# pipeline itself
 jobs:
+  # step 1
   run-tests:
+
+    # environment
     runs-on: ubuntu-latest
     steps:
+      # clones repository content to
+      # environment
       - uses: actions/checkout@v4
 
+      # install libs for the project
       - name: Install Dependencies
         run: python -m pip install -r requirements.txt
 
+      # runs backend & testing it with predicting on the file
       - name: Run Backend and Test Predict Batch
         run: |
           cd backend
@@ -49,13 +59,17 @@ jobs:
 
           kill $BACKEND_PID
 
+  # generates best_model_report.md in reports folder
   generate-report:
     needs: run-tests
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
 
+    steps:
+      # clones repository content to
+      # environment
+      - uses: actions/checkout@v4
+
+      # puts all data about model in .md file
       - name: Generate Report
         run: | 
           precision=$(jq '.precision' models/best/metadata.json)
@@ -92,6 +106,7 @@ jobs:
             echo "![Image]($rel_path)" >> "$report_path"
           done
 
+      # commits the report & pushes to the repository
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
